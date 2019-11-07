@@ -1,4 +1,4 @@
-# How to test react hooks? (How to test components that use Hooks?)
+# How to test react hooks? (How to test components that use hooks?)
 
 ## TLDR
 
@@ -6,7 +6,11 @@
 
 If you need to test a custom Hook, you can do so by creating a component in your test, and using your Hook from it. Then you can test the component you wrote. (copied).
 
-Even though hooks are just JavaScript functions, they will work only inside React components. You cannot just invoke them and write tests against what a hook returns. You have to wrap them inside a React component and test the values that it returns. (copied as well).
+Even though hooks are just JavaScript functions, they will work only inside React components.
+
+You cannot just invoke them and write tests against what a hook returns. You have to wrap them inside a React component and test the values that it returns.
+
+In some cases, hooks may not even return a value, so we have to test components that use hooks.
 
 ### Test returns of hooks OR Test components that use hooks?
 
@@ -37,6 +41,11 @@ If you are one of the following, please read on.
 
 Most of the libraries here are for testing components, not for testing the return value of hooks.
 But We can write a helper function that exposes the result of hooks from inside the component, I will show that by `enzyme`.
+
+- [react-dom/test-utils](https://reactjs.org/docs/test-utils.html)
+- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- [Enzyme](https://airbnb.io/enzyme/)
+- [react-hooks-testing-library](https://github.com/testing-library/react-hooks-testing-library)
 
 I will use following `useCounter` to show how to test. 
 
