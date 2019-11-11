@@ -42,10 +42,9 @@ If you are one of the following, please read on.
 Most of the libraries here are for testing components, not for testing the return value of hooks.
 But We can write a helper function that exposes the result of hooks from inside the component, I will show that by `enzyme`.
 
-- [react-dom/test-utils](https://reactjs.org/docs/test-utils.html)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
-- [Enzyme](https://airbnb.io/enzyme/)
-- [react-hooks-testing-library](https://github.com/testing-library/react-hooks-testing-library)
+- Basic: [react-dom/test-utils](https://reactjs.org/docs/test-utils.html)
+- Component level: [Enzyme](https://airbnb.io/enzyme/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
+- Hook level: [react-hooks-testing-library](https://github.com/testing-library/react-hooks-testing-library)
 
 I will use following `useCounter` to show how to test. 
 
@@ -163,7 +162,6 @@ it('should increment counter', () => {
   wrapper.find('button').simulate('click');
   expect(wrapper.find('button').text()).toBe('1');
 });
-
 ```
 
 - Test returns of hooks
@@ -175,25 +173,25 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import useCounter from '../useCounter';
 
-function TestHook({ hook, callback }) {
-  callback(hook());
-  return null;
-}
-
 it('should increment counter', () => {
-  let result;
+  let count;
+  let increment;
 
-  const callback = (hookReturns) => {
-    result = hookReturns;
-  };
+  function Counter() {
+    ({ count, increment } = useCounter());
 
-  shallow(<TestHook hook={useCounter} callback={callback} />);
+    return count;
+  }
 
-  expect(result.count).toBe(0);
+  shallow(<Counter />);
+  expect(count).toBe(0);
+  increment();
+  expect(count).toBe(1);
 
-  result.increment();
-
-  expect(result.count).toBe(1);
+  // const wrapper = shallow(<Counter />);
+  // expect(wrapper.text()).toBe('0');
+  // increment();
+  // expect(wrapper.text()).toBe('0');
 });
 ```
 
@@ -201,29 +199,28 @@ Obviously, we can abstract out the render logic
 
 ```js
 import React from 'react';
-import { shallow, act } from 'enzyme';
+import { shallow } from 'enzyme';
 import useCounter from '../useCounter';
 
-function TestHook({ hook, callback }) {
-  callback(hook());
-  return null;
-}
-
 function renderHook(hook) {
-  let result = {
-    current: null,
-  };
-  const callback = (hookReturns) => {
-    result.current = hookReturns;
-  };
-  shallow(<TestHook hook={useCounter} callback={callback} />);
+  let result = { current: null };
+
+  function Counter() {
+    const currentResult = hook();
+
+    result.current = currentResult;
+
+    return null;
+  }
+
+  shallow(<Counter />);
 
   return result;
-}
+};
 
 it('should increment counter', () => {
   const result = renderHook(useCounter);
-
+  
   expect(result.current.count).toBe(0);
 
   result.current.increment();
